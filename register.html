@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account — AI Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0E0F14;
+  --surface: #161820;
+  --surface2: #1E2028;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #F0F0F2;
+  --muted: #8A8B96;
+  --dim: #555663;
+  --accent: #4F8EF7;
+  --accent-bg: rgba(79,142,247,0.1);
+  --accent-border: rgba(79,142,247,0.3);
+  --green: #3FC98A;
+  --green-bg: rgba(63,201,138,0.1);
+  --error: #F76F6F;
+  --error-bg: rgba(247,111,111,0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* ── Left panel ── */
+.left {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+.left::before {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(79,142,247,0.08) 0%, transparent 70%);
+  top: -100px; left: -100px;
+  pointer-events: none;
+}
+.left::after {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(169,124,248,0.06) 0%, transparent 70%);
+  bottom: -50px; right: -50px;
+  pointer-events: none;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+.logo-icon {
+  width: 32px; height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.logo-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .05em;
+  color: var(--text);
+}
+
+.left-hero {
+  position: relative;
+  z-index: 1;
+}
+.left-hero h1 {
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1.15;
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+.left-hero h1 span {
+  background: linear-gradient(135deg, var(--accent), #A97CF8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.left-hero p {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.65;
+  margin-bottom: 36px;
+  max-width: 340px;
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.feature-dot {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.testimonial {
+  position: relative;
+  z-index: 1;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  background: var(--surface2);
+}
+.testimonial p {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.author-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #A97CF8);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+}
+.author-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+}
+.author-role {
+  font-size: 11px;
+  color: var(--dim);
+}
+
+/* ── Right panel — form ── */
+.right {
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-wrap {
+  width: 100%;
+  max-width: 380px;
+}
+
+.form-header {
+  margin-bottom: 32px;
+}
+.form-header h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.form-header p {
+  font-size: 14px;
+  color: var(--muted);
+}
+.form-header p a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.form-header p a:hover { text-decoration: underline; }
+
+.form-group {
+  margin-bottom: 16px;
+}
+.form-label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 6px;
+  letter-spacing: .02em;
+}
+.form-input {
+  width: 100%;
+  padding: 11px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color .15s, box-shadow .15s;
+  outline: none;
+}
+.form-input::placeholder { color: var(--dim); }
+.form-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+.form-input.error {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px var(--error-bg);
+}
+
+.password-wrap {
+  position: relative;
+}
+.password-toggle {
+  position: absolute;
+  right: 12px; top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--dim);
+  font-size: 13px;
+  padding: 4px;
+  transition: color .15s;
+}
+.password-toggle:hover { color: var(--muted); }
+
+.password-strength {
+  margin-top: 6px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.strength-bar {
+  height: 3px;
+  flex: 1;
+  border-radius: 99px;
+  background: var(--border2);
+  transition: background .3s;
+}
+.strength-label {
+  font-size: 11px;
+  color: var(--dim);
+  margin-left: 4px;
+  min-width: 40px;
+}
+
+.error-msg {
+  font-size: 11.5px;
+  color: var(--error);
+  margin-top: 5px;
+  display: none;
+}
+.error-msg.show { display: block; }
+
+.form-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 20px 0;
+  position: relative;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity .15s, transform .1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.submit-btn:hover { opacity: .9; }
+.submit-btn:active { transform: scale(.99); }
+.submit-btn:disabled { opacity: .5; cursor: not-allowed; }
+.submit-btn .spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  display: none;
+}
+.submit-btn.loading .spinner { display: block; }
+.submit-btn.loading .btn-text { display: none; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.terms {
+  font-size: 11.5px;
+  color: var(--dim);
+  text-align: center;
+  line-height: 1.6;
+}
+.terms a { color: var(--muted); text-decoration: underline; }
+
+.error-banner {
+  background: var(--error-bg);
+  border: 1px solid rgba(247,111,111,0.25);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--error);
+  margin-bottom: 16px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+.error-banner.show { display: flex; }
+
+.steps-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 28px;
+}
+.step-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border2);
+  transition: all .2s;
+}
+.step-dot.active {
+  width: 20px;
+  border-radius: 3px;
+  background: var(--accent);
+}
+.step-dot.done { background: var(--green); }
+
+/* responsive */
+@media (max-width: 768px) {
+  body { grid-template-columns: 1fr; }
+  .left { display: none; }
+  .right { padding: 32px 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Left: brand panel -->
+<div class="left">
+  <div class="logo">
+    <div class="logo-icon">🤖</div>
+    <span class="logo-text">AI·LEARN</span>
+  </div>
+
+  <div class="left-hero">
+    <h1>Learn AI in<br><span>30 Days</span></h1>
+    <p>A structured path from zero to confident AI practitioner — prompt engineering, content creation, and real-world workflows.</p>
+    <div class="feature-list">
+      <div class="feature-item">
+        <div class="feature-dot" style="background:rgba(79,142,247,.15);color:#4F8EF7">📅</div>
+        <span>30 days of structured learning with daily courses</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot" style="background:rgba(63,201,138,.15);color:#3FC98A">✅</div>
+        <span>Track your progress — tasks and completions saved to cloud</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot" style="background:rgba(169,124,248,.15);color:#A97CF8">🔗</div>
+        <span>Curated free courses from Google, Anthropic, DeepLearning.AI</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot" style="background:rgba(247,167,79,.15);color:#F7A74F">🌐</div>
+        <span>Access from any device — progress syncs everywhere</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="testimonial">
+    <p>"I went from knowing nothing about AI to writing complex prompt chains and producing content 5x faster. This plan is the real thing."</p>
+    <div class="testimonial-author">
+      <div class="author-avatar">SK</div>
+      <div>
+        <div class="author-name">Sofia K.</div>
+        <div class="author-role">Content strategist, completed Day 30</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Right: registration form -->
+<div class="right">
+  <div class="form-wrap">
+
+    <div class="steps-indicator">
+      <div class="step-dot active" id="step1"></div>
+      <div class="step-dot" id="step2"></div>
+      <div class="step-dot" id="step3"></div>
+    </div>
+
+    <div class="form-header">
+      <h2>Create your account</h2>
+      <p>Already have one? <a href="login.html">Sign in</a></p>
+    </div>
+
+    <div class="error-banner" id="errorBanner">
+      <span>⚠</span>
+      <span id="errorText">Something went wrong. Please try again.</span>
+    </div>
+
+    <form id="registerForm" novalidate>
+
+      <div class="form-group">
+        <label class="form-label" for="name">Full name</label>
+        <input class="form-input" type="text" id="name" placeholder="Your name" autocomplete="name" required>
+        <div class="error-msg" id="nameError">Please enter your name</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email address</label>
+        <input class="form-input" type="email" id="email" placeholder="you@example.com" autocomplete="email" required>
+        <div class="error-msg" id="emailError">Enter a valid email address</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <div class="password-wrap">
+          <input class="form-input" type="password" id="password" placeholder="8+ characters" autocomplete="new-password" required>
+          <button type="button" class="password-toggle" id="pwToggle" aria-label="Show password">👁</button>
+        </div>
+        <div class="password-strength" id="strengthMeter" style="display:none">
+          <div class="strength-bar" id="bar1"></div>
+          <div class="strength-bar" id="bar2"></div>
+          <div class="strength-bar" id="bar3"></div>
+          <div class="strength-bar" id="bar4"></div>
+          <span class="strength-label" id="strengthLabel"></span>
+        </div>
+        <div class="error-msg" id="passwordError">Password must be at least 8 characters</div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <div class="spinner"></div>
+        <span class="btn-text">Create account →</span>
+      </button>
+
+      <p class="terms">By creating an account you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
+
+    </form>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ─────────────────────────────────────────────────────────────
+  // 🔧 REPLACE THESE WITH YOUR FIREBASE PROJECT CONFIG
+  // Get these from: Firebase Console → Project Settings → Your Apps
+  // ─────────────────────────────────────────────────────────────
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  // ─────────────────────────────────────────────────────────────
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Password strength
+  const pw = document.getElementById('password');
+  const meter = document.getElementById('strengthMeter');
+  const bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3'), document.getElementById('bar4')];
+  const label = document.getElementById('strengthLabel');
+  const COLORS = ['#F76F6F','#F7A74F','#4F8EF7','#3FC98A'];
+  const LABELS = ['Weak','Fair','Good','Strong'];
+
+  pw.addEventListener('input', () => {
+    const v = pw.value;
+    if (!v) { meter.style.display='none'; return; }
+    meter.style.display='flex';
+    let score = 0;
+    if (v.length >= 8) score++;
+    if (/[A-Z]/.test(v)) score++;
+    if (/[0-9]/.test(v)) score++;
+    if (/[^A-Za-z0-9]/.test(v)) score++;
+    bars.forEach((b,i)=> b.style.background = i < score ? COLORS[score-1] : 'var(--border2)');
+    label.textContent = LABELS[score-1] || '';
+    label.style.color = COLORS[score-1] || 'var(--dim)';
+    updateStep(score);
+  });
+
+  function updateStep(score) {
+    document.getElementById('step1').className = 'step-dot done';
+    document.getElementById('step2').className = score >= 2 ? 'step-dot active' : 'step-dot';
+    document.getElementById('step3').className = score >= 4 ? 'step-dot done' : 'step-dot';
+  }
+
+  // Toggle password visibility
+  document.getElementById('pwToggle').addEventListener('click', () => {
+    pw.type = pw.type === 'password' ? 'text' : 'password';
+  });
+
+  // Form submission
+  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = pw.value;
+    let valid = true;
+
+    if (!name) { showFieldError('name', 'nameError'); valid = false; }
+    if (!email || !/\S+@\S+\.\S+/.test(email)) { showFieldError('email', 'emailError'); valid = false; }
+    if (password.length < 8) { showFieldError('password', 'passwordError'); valid = false; }
+    if (!valid) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+      // 1. Create Firebase Auth user
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+      // 2. Update display name
+      await updateProfile(cred.user, { displayName: name });
+
+      // 3. Save user profile to Firestore
+      await setDoc(doc(db, 'users', cred.user.uid), {
+        name,
+        email,
+        createdAt: serverTimestamp(),
+        currentDay: 1,
+        completedDays: [],
+        completedTasks: {},
+        streak: 0,
+        lastActiveAt: serverTimestamp()
+      });
+
+      // 4. Redirect to welcome page
+      window.location.href = 'welcome.html';
+
+    } catch (err) {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+
+      const messages = {
+        'auth/email-already-in-use': 'An account with this email already exists. Try signing in.',
+        'auth/invalid-email': 'That email address doesn\'t look right.',
+        'auth/weak-password': 'Choose a stronger password (6+ characters).',
+        'auth/network-request-failed': 'Connection error. Check your internet and try again.',
+      };
+      showBanner(messages[err.code] || `Error: ${err.message}`);
+    }
+  });
+
+  function showFieldError(inputId, errorId) {
+    document.getElementById(inputId).classList.add('error');
+    document.getElementById(errorId).classList.add('show');
+  }
+  function clearErrors() {
+    ['name','email','password'].forEach(id => {
+      document.getElementById(id).classList.remove('error');
+    });
+    ['nameError','emailError','passwordError'].forEach(id => {
+      document.getElementById(id).classList.remove('show');
+    });
+    document.getElementById('errorBanner').classList.remove('show');
+  }
+  function showBanner(msg) {
+    document.getElementById('errorText').textContent = msg;
+    document.getElementById('errorBanner').classList.add('show');
+  }
+</script>
+
+</body>
+</html>

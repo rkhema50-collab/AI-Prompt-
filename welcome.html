@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome — AI Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0E0F14;
+  --surface: #161820;
+  --surface2: #1E2028;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #F0F0F2;
+  --muted: #8A8B96;
+  --dim: #555663;
+  --accent: #4F8EF7;
+  --accent-bg: rgba(79,142,247,0.1);
+  --green: #3FC98A;
+  --green-bg: rgba(63,201,138,0.1);
+  --w1: #4F8EF7; --w2: #3FC98A; --w3: #F7A74F; --w4: #A97CF8;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+}
+
+.glow {
+  position: fixed;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(79,142,247,0.05) 0%, transparent 65%);
+  top: -200px; left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.card {
+  width: 100%;
+  max-width: 520px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  overflow: hidden;
+  animation: slideUp .4s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card-top {
+  background: linear-gradient(135deg, rgba(79,142,247,0.12), rgba(169,124,248,0.08));
+  border-bottom: 1px solid var(--border);
+  padding: 36px 36px 28px;
+  text-align: center;
+  position: relative;
+}
+.confetti {
+  font-size: 36px;
+  margin-bottom: 12px;
+  display: block;
+  animation: bounce .6s ease .2s both;
+}
+@keyframes bounce {
+  0%   { transform: scale(.5); opacity: 0; }
+  70%  { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.welcome-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  letter-spacing: -.01em;
+}
+.welcome-title span {
+  background: linear-gradient(135deg, var(--accent), #A97CF8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.welcome-sub {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.card-body { padding: 28px 36px; }
+
+.section-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--dim);
+  margin-bottom: 14px;
+}
+
+.weeks-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.week-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.week-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.week-info {}
+.week-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.week-sub {
+  font-size: 11px;
+  color: var(--dim);
+  line-height: 1.4;
+}
+
+.day1-preview {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.day1-badge {
+  background: rgba(79,142,247,.15);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.day1-text {}
+.day1-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.day1-course {
+  font-size: 11.5px;
+  color: var(--dim);
+}
+
+.tips {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.tip-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.tip-icon {
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  background: var(--surface2);
+}
+
+.start-btn {
+  display: flex;
+  width: 100%;
+  padding: 13px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity .15s, transform .1s;
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+.start-btn:hover { opacity: .9; }
+.start-btn:active { transform: scale(.99); }
+
+.skip-link {
+  display: block;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--dim);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color .15s;
+}
+.skip-link:hover { color: var(--muted); }
+
+.progress-note {
+  margin-top: 20px;
+  padding: 12px 14px;
+  background: rgba(63,201,138,.08);
+  border: 1px solid rgba(63,201,138,.2);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .card-top { padding: 28px 24px 20px; }
+  .card-body { padding: 24px; }
+  .weeks-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="glow"></div>
+
+<div class="card">
+  <div class="card-top">
+    <span class="confetti">🎉</span>
+    <h1 class="welcome-title">Welcome, <span id="userName">Learner</span>!</h1>
+    <p class="welcome-sub">Your account is ready. Here's what the next 30 days look like — let's start Day 1 right now.</p>
+  </div>
+
+  <div class="card-body">
+
+    <div class="section-label">Your 30-day roadmap</div>
+    <div class="weeks-grid">
+      <div class="week-item">
+        <div class="week-dot" style="background:#4F8EF7"></div>
+        <div class="week-info">
+          <div class="week-name">Week 1</div>
+          <div class="week-sub">Foundations & first prompts</div>
+        </div>
+      </div>
+      <div class="week-item">
+        <div class="week-dot" style="background:#3FC98A"></div>
+        <div class="week-info">
+          <div class="week-name">Week 2</div>
+          <div class="week-sub">Advanced prompting techniques</div>
+        </div>
+      </div>
+      <div class="week-item">
+        <div class="week-dot" style="background:#F7A74F"></div>
+        <div class="week-info">
+          <div class="week-name">Week 3</div>
+          <div class="week-sub">AI content creation</div>
+        </div>
+      </div>
+      <div class="week-item">
+        <div class="week-dot" style="background:#A97CF8"></div>
+        <div class="week-info">
+          <div class="week-name">Week 4</div>
+          <div class="week-sub">Mastery & real projects</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Starting today — Day 1</div>
+    <div class="day1-preview">
+      <div class="day1-badge">Day 1</div>
+      <div class="day1-text">
+        <div class="day1-title">What is AI & how do LLMs work?</div>
+        <div class="day1-course">📚 3Blue1Brown · YouTube · 27 min · Free</div>
+      </div>
+    </div>
+
+    <div class="section-label">3 things to know</div>
+    <div class="tips">
+      <div class="tip-row">
+        <div class="tip-icon">⏱</div>
+        <span>Spend 30–60 minutes per day — consistency beats intensity</span>
+      </div>
+      <div class="tip-row">
+        <div class="tip-icon">📝</div>
+        <span>Check off tasks as you go — your progress saves to the cloud</span>
+      </div>
+      <div class="tip-row">
+        <div class="tip-icon">🔄</div>
+        <span>Log in from any device and pick up exactly where you left off</span>
+      </div>
+    </div>
+
+    <a href="index.html" class="start-btn">Start Day 1 →</a>
+    <a class="skip-link" href="index.html">Go to the full dashboard</a>
+
+    <div class="progress-note">
+      ✓ Your progress is saved to the cloud — come back any time from any device.
+    </div>
+
+  </div>
+</div>
+
+<!-- Firebase: load user name -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  // 🔧 PASTE YOUR SAME firebaseConfig HERE
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const first = (user.displayName || 'Learner').split(' ')[0];
+      document.getElementById('userName').textContent = first;
+    } else {
+      // Not logged in — redirect back to register
+      window.location.href = 'register.html';
+    }
+  });
+</script>
+
+</body>
+</html>

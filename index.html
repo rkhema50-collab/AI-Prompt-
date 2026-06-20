@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30-Day AI Learning Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0E0F14;
+  --surface: #161820;
+  --surface2: #1E2028;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #F0F0F2;
+  --muted: #8A8B96;
+  --dim: #555663;
+
+  --w1: #4F8EF7;
+  --w1bg: rgba(79,142,247,0.12);
+  --w1b: rgba(79,142,247,0.25);
+  --w2: #3FC98A;
+  --w2bg: rgba(63,201,138,0.12);
+  --w2b: rgba(63,201,138,0.25);
+  --w3: #F7A74F;
+  --w3bg: rgba(247,167,79,0.12);
+  --w3b: rgba(247,167,79,0.25);
+  --w4: #A97CF8;
+  --w4bg: rgba(169,124,248,0.12);
+  --w4b: rgba(169,124,248,0.25);
+
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 10;
+  overflow-y: auto;
+}
+
+.logo {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-mark {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .12em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.logo-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.progress-block {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.progress-bar {
+  height: 4px;
+  background: var(--border2);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--w1), var(--w4));
+  transition: width .4s ease;
+}
+
+.nav-section {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.nav-week-header {
+  padding: 6px 20px 4px;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.nav-day {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 20px;
+  cursor: pointer;
+  transition: background .12s;
+  border-radius: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  position: relative;
+}
+.nav-day:hover { background: var(--surface2); color: var(--text); }
+.nav-day.active { color: var(--text); background: var(--surface2); }
+.nav-day.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 4px; bottom: 4px;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+}
+.nav-day.done .day-dot { opacity: .5; }
+.day-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.day-check {
+  margin-left: auto;
+  font-size: 11px;
+  opacity: .5;
+}
+.nav-day.done .day-label { text-decoration: line-through; opacity: .5; }
+
+/* ── Main ── */
+.main {
+  margin-left: 240px;
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  padding: 16px 32px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 5;
+}
+
+.week-tabs {
+  display: flex;
+  gap: 6px;
+}
+.wtab {
+  padding: 5px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--border2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  color: var(--muted);
+  transition: all .15s;
+  font-family: inherit;
+}
+.wtab:hover { color: var(--text); border-color: var(--border2); }
+.wtab.on { color: var(--text); border-color: transparent; }
+
+.topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.stat-chip {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.stat-chip strong { color: var(--text); font-weight: 600; }
+
+.content {
+  padding: 28px 32px;
+  flex: 1;
+}
+
+/* ── Day panel ── */
+.day-panel { display: none; }
+.day-panel.on { display: block; }
+
+.day-hero {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.day-num-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.day-hero-text h1 {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  margin-bottom: 6px;
+}
+.day-hero-text p {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.grid-full { margin-bottom: 16px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+.card-label {
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--dim);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.card-label svg { opacity: .5; }
+
+/* Course card */
+.course-header {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.course-icon-box {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.course-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  line-height: 1.3;
+}
+.course-by {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.course-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.course-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-weight: 500;
+}
+.badge-free { background: rgba(63,201,138,.15); color: #3FC98A; }
+.badge-paid { background: rgba(247,167,79,.15); color: #F7A74F; }
+.badge-time { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+.open-btn {
+  margin-left: auto;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  transition: all .15s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.open-btn:hover { background: var(--surface2); border-color: var(--border2); }
+
+/* Task list */
+.task-list { list-style: none; }
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.task-item:last-child { border-bottom: none; }
+.task-item:hover { opacity: .85; }
+.task-cb {
+  width: 16px; height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid var(--dim);
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.task-item.done .task-cb {
+  background: var(--w2);
+  border-color: var(--w2);
+}
+.task-item.done .task-cb::after {
+  content: '✓';
+  font-size: 10px;
+  color: #0E0F14;
+  font-weight: 700;
+}
+.task-item.done .task-text {
+  text-decoration: line-through;
+  opacity: .45;
+}
+.task-text {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+/* Tip card */
+.tip-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.tip-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Nav nav */
+.day-nav {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.nav-btn {
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  transition: all .15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.nav-btn:hover { color: var(--text); background: var(--surface); }
+.nav-btn.primary { color: var(--text); border-color: var(--border2); background: var(--surface); }
+.nav-btn.mark-done {
+  margin-left: auto;
+  color: var(--w2);
+  border-color: var(--w2b);
+}
+.nav-btn.mark-done:hover { background: var(--w2bg); }
+.nav-btn.marked { background: var(--w2bg); color: var(--w2); }
+
+/* Week overview cards */
+.week-overview {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.week-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.week-card:hover { border-color: var(--border2); }
+.week-card.active { border-color: var(--border2); }
+.wc-label { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; font-weight: 500; margin-bottom: 4px; }
+.wc-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.wc-sub { font-size: 11px; color: var(--muted); }
+.wc-prog { height: 2px; border-radius: 99px; background: var(--border); margin-top: 10px; overflow: hidden; }
+.wc-pfill { height: 100%; border-radius: 99px; transition: width .4s; }
+
+/* responsive */
+@media (max-width: 900px) {
+  .sidebar { width: 200px; }
+  .main { margin-left: 200px; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .week-overview { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .week-overview { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar"></aside>
+
+<!-- Main content -->
+<div class="main">
+  <div class="topbar">
+    <div class="week-tabs" id="weekTabs"></div>
+    <div class="topbar-right">
+      <div class="stat-chip">Day <strong id="currentDayLabel">1</strong> of 30</div>
+      <div class="stat-chip"><strong id="doneCount">0</strong> days done</div>
+    </div>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+
+<script>
+const WEEKS = [
+  { label:'Week 1', title:'Foundations', sub:'How AI works + first prompts', color:'var(--w1)', bg:'var(--w1bg)', border:'var(--w1b)' },
+  { label:'Week 2', title:'Advanced Prompting', sub:'CoT, personas & templates', color:'var(--w2)', bg:'var(--w2bg)', border:'var(--w2b)' },
+  { label:'Week 3', title:'AI Content', sub:'Blogs, social, video & images', color:'var(--w3)', bg:'var(--w3bg)', border:'var(--w3b)' },
+  { label:'Week 4', title:'Mastery', sub:'Workflows, tools & real projects', color:'var(--w4)', bg:'var(--w4bg)', border:'var(--w4b)' },
+];
+
+const DAYS = [
+  // Week 1
+  { w:0, title:'What is AI & how do LLMs work?',
+    desc:'Start with the most important question: how does this technology actually work? You don\'t need to understand the math — just the intuition.',
+    course:{ name:'How Large Language Models Work', by:'3Blue1Brown · YouTube', free:true, time:'27 min', url:'https://www.youtube.com/watch?v=wjZofJX0v4M', desc:'The best visual explanation of how neural networks and LLMs predict text. No math required — pure intuition.' },
+    tasks:['Watch the video once fully, then re-watch the key sections','Write 5 sentences explaining AI to a friend in your own words','Open Claude or ChatGPT and say hello — try your first prompt'],
+    tip:'Don\'t overthink the tech. Focus on the concept of "predicting next words based on patterns."' },
+  { w:0, title:'Your first prompts',
+    desc:'Now that you know how AI works, it\'s time to actually use it. Write as many prompts as possible today — quality comes from quantity at this stage.',
+    course:{ name:'Introduction to Generative AI', by:'Google Cloud · Free', free:true, time:'45 min', url:'https://www.cloudskillsboost.google/course_templates/536', desc:'Google\'s beginner-friendly intro covering what generative AI is, how it works, and its real-world applications.' },
+    tasks:['Complete Google\'s Intro to Generative AI course','Write 10 different prompts on topics you care about','Note which responses felt useful vs. vague — save your best 3'],
+    tip:'The quality of your output is directly tied to the clarity of your input.' },
+  { w:0, title:'Prompt anatomy — role, context, task',
+    desc:'The single framework that will improve every prompt you write: every strong prompt has three parts. Learn this once and use it forever.',
+    course:{ name:'Prompt Engineering for ChatGPT', by:'Vanderbilt University · Coursera', free:true, time:'Modules 1–2 (~2 hrs)', url:'https://www.coursera.org/learn/prompt-engineering', desc:'Dr. Jules White\'s university course. Modules 1 and 2 cover prompt patterns and the core structure framework.' },
+    tasks:['Complete Modules 1 & 2 of the Vanderbilt course','Rewrite 3 of your Day 2 prompts using Role + Context + Task','Compare old vs. new outputs — document what changed'],
+    tip:'Example: "You are a marketing expert [role]. I run a small bakery [context]. Write 5 Instagram captions [task]."' },
+  { w:0, title:'Zero-shot vs few-shot prompting',
+    desc:'Two of the most important prompting techniques. Zero-shot = no examples. Few-shot = you show AI what you want first. Knowing when to use each is a core skill.',
+    course:{ name:'ChatGPT Prompt Engineering for Developers', by:'DeepLearning.AI + OpenAI · Free', free:true, time:'~1 hr', url:'https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/', desc:'Taught by Andrew Ng & Isa Fulford from OpenAI. Covers zero-shot, few-shot, and core prompting best practices. Widely considered the best single hour on prompt engineering.' },
+    tasks:['Complete the full DeepLearning.AI short course','Write one zero-shot and one few-shot prompt for the same task','Document which gave better results and why'],
+    tip:'Few-shot prompting often dramatically improves output quality for creative or structured tasks.' },
+  { w:0, title:'Output formats & structure',
+    desc:'AI can respond in almost any format — but only if you ask. Today you\'ll master output control: tables, bullets, JSON, markdown, and length constraints.',
+    course:{ name:'Generative AI: Prompt Engineering Basics', by:'IBM · Coursera (free audit)', free:true, time:'~2 hrs', url:'https://www.coursera.org/learn/generative-ai-prompt-engineering-for-everyone', desc:'IBM\'s 4.8-star rated course (351k+ learners). Covers prompt techniques, output formatting, and structured response best practices.' },
+    tasks:['Complete the IBM course section on output formats','Ask AI to respond in bullets, tables, JSON, and markdown for the same prompt','Practice specifying length: "200 words max", "5 bullet points"'],
+    tip:'AI can mimic almost any format — you just have to ask explicitly.' },
+  { w:0, title:'Iterate & refine prompts',
+    desc:'Prompting is a conversation, not a one-shot request. Today you learn the art of iteration — how to go from a good prompt to a great one in 3–5 follow-ups.',
+    course:{ name:'Anthropic\'s Prompt Engineering Guide', by:'Anthropic · Free documentation', free:true, time:'30–45 min read', url:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview', desc:'Anthropic\'s official guide on writing better prompts for Claude. Covers iteration, clarity, and the most common mistakes to avoid.' },
+    tasks:['Read the full Anthropic prompt engineering guide','Pick one topic and write 5 different prompt variations','Build your first prompt bank with 10+ entries in a doc'],
+    tip:'Prompting is a conversation. Iteration is the skill — not writing the perfect prompt on the first try.' },
+  { w:0, title:'Week 1 review & reflection',
+    desc:'Don\'t skip this day. Reflection is what turns practice into skill. Review everything you\'ve learned and set yourself up for the more advanced Week 2.',
+    course:{ name:'AI For Everyone — Week 1', by:'Andrew Ng · Coursera (free audit)', free:true, time:'~1 hr', url:'https://www.coursera.org/learn/ai-for-everyone', desc:'Andrew Ng\'s non-technical AI course for everyone. Week 1 solidifies your conceptual foundation before you move deeper.' },
+    tasks:['Complete Week 1 of AI For Everyone by Andrew Ng','Review all prompts from this week — pick your top 3','Write your goal for Week 2 and put it somewhere visible'],
+    tip:'Reflection is what turns practice into real skill. The 20 minutes you spend here will accelerate everything that follows.' },
+  // Week 2
+  { w:1, title:'Chain-of-thought prompting',
+    desc:'Five words that dramatically improve AI reasoning: "Let\'s think step by step." Chain-of-thought prompting is one of the most research-backed techniques available.',
+    course:{ name:'Prompt Engineering Guide — CoT Chapter', by:'PromptingGuide.ai · Free', free:true, time:'20 min read', url:'https://www.promptingguide.ai/techniques/cot', desc:'The most cited free resource on chain-of-thought prompting. Clear examples, research-backed techniques, and when to use it.' },
+    tasks:['Read the full CoT chapter at PromptingGuide.ai','Try "Think step by step" on 5 different problems or tasks','Compare CoT vs. standard responses — what specifically changed?'],
+    tip:'"Let\'s think step by step" is one of the most powerful 5-word prompts ever discovered in AI research.' },
+  { w:1, title:'Persona & role prompting',
+    desc:'Assigning an expert role to AI changes everything: the vocabulary, depth, tone, and perspective of the response shifts dramatically.',
+    course:{ name:'Prompt Engineering for ChatGPT — Module 3', by:'Vanderbilt University · Coursera', free:true, time:'~1 hr', url:'https://www.coursera.org/learn/prompt-engineering', desc:'Covers the Persona Pattern and expert role assignment with real examples and exercises.' },
+    tasks:['Complete Module 3 of the Vanderbilt course','Try 5 different expert personas on the same task','Document how tone, vocabulary, and depth change with each persona'],
+    tip:'Persona prompting is like having access to a specialist for every task, for free, instantly.' },
+  { w:1, title:'Negative prompting & constraints',
+    desc:'Telling AI what NOT to do is just as powerful as telling it what to do. Constraints improve quality, remove clichés, and force more creative thinking.',
+    course:{ name:'Advanced Prompt Techniques', by:'PromptingGuide.ai · Free', free:true, time:'30 min read', url:'https://www.promptingguide.ai/techniques', desc:'Covers negative prompting, output constraints, and how to refine prompts to eliminate unwanted patterns.' },
+    tasks:['Read the techniques section at PromptingGuide.ai','Write 5 prompts combining positive AND negative instructions','Try: "No clichés", "Don\'t use jargon", "Avoid bullet points"'],
+    tip:'Constraints often improve creativity. Limits force better solutions.' },
+  { w:1, title:'System prompts & custom instructions',
+    desc:'System prompts define the AI\'s "character" for an entire session. They\'re the most powerful tool for building consistent, reliable AI assistants.',
+    course:{ name:'Building Systems with the ChatGPT API', by:'DeepLearning.AI · Free', free:true, time:'~1 hr', url:'https://www.deeplearning.ai/short-courses/building-systems-with-chatgpt/', desc:'Covers system prompts, multi-turn conversations, and building AI-powered systems. The coding parts are optional.' },
+    tasks:['Complete the DeepLearning.AI systems short course','Write a custom system prompt for your personal AI assistant','Test it with 10 different user messages — refine based on results'],
+    tip:'System prompts define the character of the AI for an entire session. Master this and you\'ve built your own assistant.' },
+  { w:1, title:'Prompt templates & reusability',
+    desc:'Templates are your productivity multiplier. Build a prompt once, use it for every similar task forever. Today you create your first reusable prompt system.',
+    course:{ name:'ChatGPT & AI Prompt Templates', by:'Udemy · (search for free coupon)', free:false, time:'2–3 relevant sections', url:'https://www.udemy.com/topic/chatgpt/', desc:'Practical course sections on building reusable prompt templates. Search for free coupon codes on CouponScorpion.com before purchasing.' },
+    tasks:['Build 3 reusable prompt templates using [TOPIC], [TONE], [AUDIENCE] variables','Test each template with 3 different inputs to verify it works broadly','Add all templates to your prompt bank with usage notes'],
+    tip:'Templates are your competitive advantage. One hour building them saves hundreds of hours later.' },
+  { w:1, title:'Handling AI mistakes & hallucinations',
+    desc:'AI is confidently wrong sometimes. Understanding why this happens — and how to prompt around it — is a critical professional skill.',
+    course:{ name:'Why AI Hallucinates — MIT Explainer', by:'MIT News · Free article', free:true, time:'30 min reading', url:'https://news.mit.edu/2023/explained-generative-ai-0208', desc:'MIT\'s explainer on generative AI reliability, hallucinations, and the fundamental reasons LLMs make things up.' },
+    tasks:['Read the MIT article on AI hallucinations','Practice prompting AI to signal uncertainty: "If unsure, say so"','Add reliability checks to 5 of your most-used prompts'],
+    tip:'Always verify important facts. AI is confident even when wrong. Your judgment is the quality filter.' },
+  { w:1, title:'Week 2 project — build a prompt library',
+    desc:'This is your Week 2 deliverable: a structured, organized prompt library you\'ll use for the rest of the 30 days and beyond.',
+    course:{ name:'Prompt Library in Notion — Tutorial', by:'YouTube · Free walkthroughs', free:true, time:'20–30 min', url:'https://www.youtube.com/results?search_query=prompt+library+notion+template', desc:'Search "prompt library Notion template" on YouTube. Multiple free tutorials walk through setting up organized, categorized prompt databases.' },
+    tasks:['Create a structured prompt library in Notion or Google Docs','Organize by category: Writing, Research, Marketing, Coding, Analysis','Add at least 20 prompts with notes on when and how to use each'],
+    tip:'Your prompt library is your most valuable AI asset. It compounds in value every day you add to it.' },
+  // Week 3
+  { w:2, title:'AI for blog writing',
+    desc:'AI as a co-writer — not a ghostwriter. Today you learn to use AI to draft faster while keeping your authentic voice and perspective in the final piece.',
+    course:{ name:'AI-Powered Writing & Content', by:'HubSpot Academy · Free', free:true, time:'~1.5 hrs', url:'https://academy.hubspot.com/courses/content-marketing', desc:'HubSpot\'s free content marketing course includes an AI writing module covering blog creation, SEO structure, and how to edit AI drafts effectively.' },
+    tasks:['Complete the AI writing module in HubSpot Academy','Write a full blog post outline with AI assistance','Draft one complete section using AI, then rewrite it in your own voice'],
+    tip:'AI is a co-writer, not a ghostwriter. Your edits, perspective, and experience are what make content valuable.' },
+  { w:2, title:'Social media content at scale',
+    desc:'The biggest unlock in social media: create 30 days of content in one session. Today you build a replicable system for high-volume content creation.',
+    course:{ name:'Social Media Marketing with AI', by:'Meta Blueprint · Free', free:true, time:'~1 hr', url:'https://www.facebook.com/business/learn/courses', desc:'Meta\'s free social media content strategy course. Combine with AI tools to create content at scale across platforms.' },
+    tasks:['Complete the Meta Blueprint social strategy module','Write 30 social posts on one topic using AI','Create a 2-week content calendar for one platform'],
+    tip:'Batch content creation with AI. Produce a full month of posts in an hour.' },
+  { w:2, title:'Email marketing copy',
+    desc:'Email is still the highest-ROI content format. Today you master AI-assisted email copywriting: subject lines, body copy, sequences, and CTAs.',
+    course:{ name:'Email Marketing Certification — Module 5', by:'HubSpot Academy · Free', free:true, time:'~45 min', url:'https://academy.hubspot.com/courses/email-marketing', desc:'Study Module 5 on copywriting specifically. Covers email structure, subject line psychology, and CTAs — then apply AI to execute each.' },
+    tasks:['Complete Module 5 of HubSpot\'s email marketing course','Write a cold outreach email and a 3-email welcome sequence using AI','Generate 5 subject line variations for each email and compare them'],
+    tip:'Test subject lines with AI before sending. Ask it to predict open rates and explain why.' },
+  { w:2, title:'Video scripts & YouTube content',
+    desc:'Video is the highest-reach content format. AI dramatically speeds up scriptwriting, structuring hooks, and generating title ideas that actually get clicks.',
+    course:{ name:'YouTube Creator Academy — Scripting', by:'YouTube · Free', free:true, time:'Scripting module (~1 hr)', url:'https://creatoracademy.youtube.com/', desc:'YouTube\'s official creator training on scripting, hooks, and storytelling structure. Use AI to execute what you learn here.' },
+    tasks:['Study the YouTube Creator Academy scripting and storytelling module','Write a full 3-minute video script on a topic you know — AI-assisted','Generate 10 title ideas and 5 thumbnail text options with AI'],
+    tip:'The hook — your first 15 seconds — matters most. Spend the most prompt iterations here.' },
+  { w:2, title:'SEO content with AI',
+    desc:'SEO + AI is one of the most valuable skill combinations available right now. Today you learn to produce search-optimized content at scale without sacrificing quality.',
+    course:{ name:'SEO Certification — Content Module', by:'HubSpot Academy · Free', free:true, time:'~1.5 hrs', url:'https://academy.hubspot.com/courses/seo-training-course', desc:'Learn SEO fundamentals, then use AI to execute: keyword research, content briefs, meta descriptions, and FAQ sections.' },
+    tasks:['Complete the HubSpot SEO and content module','Write a 500-word SEO-optimized article section with AI assistance','Use AI to generate meta descriptions, H2 headings, and FAQ answers'],
+    tip:'Combine AI speed with human SEO judgment. Never publish without reviewing for accuracy and originality.' },
+  { w:2, title:'AI images & visual content',
+    desc:'Words aren\'t the only content AI can create. Today you explore AI image generation: how to write image prompts that produce professional-quality visuals.',
+    course:{ name:'Midjourney & AI Image — Beginner Guide', by:'YouTube · Free tutorials', free:true, time:'30–45 min', url:'https://www.youtube.com/results?search_query=midjourney+beginner+guide+2025', desc:'Search "Midjourney beginner guide 2025" or "DALL-E 3 tutorial" on YouTube. Many excellent free walkthroughs are available.' },
+    tasks:['Watch one complete beginner tutorial on an AI image generation tool','Write your first 10 image prompts: style + subject + mood + lighting','Generate images and compare — which prompts produced the best results?'],
+    tip:'Image prompts work best with specific adjectives: "photorealistic", "flat illustration", "cinematic lighting", "editorial style".' },
+  { w:2, title:'Week 3 project — full content package',
+    desc:'Your Week 3 deliverable: a complete, real content package for one topic or product. This becomes your portfolio piece demonstrating AI content creation skills.',
+    course:{ name:'Content Strategy for Professionals — Week 1', by:'Northwestern University · Coursera', free:true, time:'~1 hr', url:'https://www.coursera.org/learn/content-strategy', desc:'Northwestern\'s strategic content course. Audit Week 1 to learn how to think about content packages holistically before creating yours.' },
+    tasks:['Complete Week 1 of Northwestern\'s content strategy course','Create your full package: 1 blog, 5 social posts, 1 email, 3 images','Review everything and add your authentic voice to every piece'],
+    tip:'This project is your portfolio piece. Focus on quality over speed today.' },
+  // Week 4
+  { w:3, title:'Build an AI workflow',
+    desc:'Individual prompts are powerful. AI workflows are transformative. Today you map and build a repeatable system that automates a real task you do every week.',
+    course:{ name:'AI Automation & Workflow Design', by:'Make.com Academy · Free', free:true, time:'~1 hr', url:'https://www.make.com/en/academy', desc:'Make (formerly Integromat) offers free courses on automating workflows with AI. Learn to chain tools and automate repeatable tasks.' },
+    tasks:['Complete the Make.com intro to automation course','Map one real weekly task that could be AI-assisted','Build and test a step-by-step AI workflow for that task — time yourself'],
+    tip:'The goal isn\'t to replace your work. It\'s to spend more time on the parts only you can do.' },
+  { w:3, title:'AI for research & summarization',
+    desc:'AI can read, compare, and summarize sources faster than any human. Today you develop a repeatable research process using AI as your research assistant.',
+    course:{ name:'Perplexity AI Research Tutorial', by:'YouTube · Free', free:true, time:'20–30 min', url:'https://www.youtube.com/results?search_query=perplexity+ai+tutorial+2025', desc:'Search "Perplexity AI tutorial 2025" on YouTube. Learn to use AI for deep research, source comparison, and structured summarization.' },
+    tasks:['Learn Perplexity AI via a YouTube tutorial','Paste a long article into Claude and practice extracting key takeaways','Use AI to compare 3 different sources on one topic you care about'],
+    tip:'AI can read faster than you. Use it as a research assistant, not a replacement for your own judgment.' },
+  { w:3, title:'Prompt chaining & multi-step tasks',
+    desc:'The output of one prompt becomes the input of the next. Prompt chains simulate a creative team working in sequence — and the results are dramatically better.',
+    course:{ name:'LangChain for LLM Application Development', by:'DeepLearning.AI · Free', free:true, time:'~1.5 hrs', url:'https://www.deeplearning.ai/short-courses/langchain-for-llm-application-development/', desc:'Andrew Ng\'s course on chaining AI prompts into multi-step workflows. Focus on the concepts — the code is optional.' },
+    tasks:['Complete the LangChain short course (concepts first, code optional)','Design a 5-step prompt chain: idea → expand → write → critique → revise','Test your chain on a real project and document what each step produces'],
+    tip:'Prompt chains simulate a creative team working together. Each step builds on the last.' },
+  { w:3, title:'AI tools ecosystem deep dive',
+    desc:'There are dozens of AI tools available. Today you map the landscape, test the key ones, and build your personal toolkit based on what fits your actual workflow.',
+    course:{ name:'Generative AI Tools Overview', by:'LinkedIn Learning · Free trial', free:false, time:'~2 hrs', url:'https://www.linkedin.com/learning/topics/generative-ai', desc:'LinkedIn Learning\'s overview of the AI tools landscape. Free with a 1-month trial. Covers Claude, ChatGPT, Gemini, Jasper, Perplexity and more.' },
+    tasks:['Complete the LinkedIn Learning AI tools overview (free trial)','Run the same prompt in Claude, ChatGPT, and Gemini — compare results','Choose your 2–3 primary tools based on what fits your workflow best'],
+    tip:'Different AI tools have different strengths. Build a toolkit, not a single dependency.' },
+  { w:3, title:'Ethical AI & responsible use',
+    desc:'Being a responsible AI user is a professional skill. Understanding bias, hallucinations, copyright, and appropriate use builds trust with clients and employers.',
+    course:{ name:'Responsible AI Practices', by:'Google Cloud Skills Boost · Free', free:true, time:'~1 hr', url:'https://www.cloudskillsboost.google/course_templates/554', desc:'Google\'s official responsible AI course covering bias, fairness, transparency, and ethical use in real-world applications.' },
+    tasks:['Complete Google\'s Responsible AI course','Write your personal AI use policy — one page, honest and specific','List 5 tasks where you will use AI and 5 where you won\'t'],
+    tip:'Being a responsible AI user is a professional skill. It builds trust in every relationship where AI is involved.' },
+  { w:3, title:'Teach what you know',
+    desc:'Teaching is the fastest path to mastery. If you can explain a concept clearly to someone else, you truly understand it. Today you share what you\'ve learned.',
+    course:{ name:'The Feynman Technique', by:'YouTube · Free explainers', free:true, time:'15 min', url:'https://www.youtube.com/results?search_query=feynman+technique+explained', desc:'Search "Feynman Technique explained" on YouTube. Learn to teach concepts simply — the fastest known method for solidifying your own knowledge.' },
+    tasks:['Write a short guide: "5 prompts every [your profession] should know"','Explain one AI concept to a friend or colleague today','Post one AI tip or insight on LinkedIn, X, or in a community you\'re part of'],
+    tip:'Teaching is the fastest path to mastery. If you can explain it simply, you own it.' },
+  { w:3, title:'Final project — showcase piece',
+    desc:'Your 30-day finale: build something real. This is your proof of skill — more valuable than any certificate. Make it something you\'re genuinely proud of.',
+    course:{ name:'Portfolio Building with Google Career Resources', by:'Grow with Google · Free', free:true, time:'~1 hr', url:'https://grow.google/certificates/', desc:'Google\'s free career development resources on building an AI skills portfolio and presenting your work professionally.' },
+    tasks:['Build a real deliverable: newsletter, content strategy, landing page, or tool','Use at least 5 prompting techniques you\'ve learned over the past 4 weeks','Document your process — what AI helped with vs. what you added'],
+    tip:'Real output beats any certificate. This project is your portfolio. Make it count.' },
+  { w:3, title:'Review & gap analysis',
+    desc:'30 days is a beginning, not an end. Today you honestly assess where you\'ve grown, where the gaps still are, and chart your next 30 days of AI learning.',
+    course:{ name:'Advanced Prompt Engineering — What\'s Next', by:'Towards Data Science · Free', free:true, time:'30 min reading', url:'https://towardsdatascience.com/tagged/prompt-engineering', desc:'Search "advanced prompt engineering 2025" on Medium or Towards Data Science to find articles pointing to your next learning frontier.' },
+    tasks:['Review your prompt library — what categories are still thin?','Identify 3 specific areas where you still feel uncertain','Find one course, community, or book to go deeper into your weakest area'],
+    tip:'30 days is a beginning, not an end. Identify your next level now while the momentum is alive.' },
+  { w:3, title:'Celebrate & plan what\'s next',
+    desc:'You did it. 30 days of consistent, deliberate AI learning. Take a moment to acknowledge that — then set your next target while the momentum is alive.',
+    course:{ name:'AI Power User — Andrew Ng\'s Newest Course', by:'DeepLearning.AI · Free', free:true, time:'~2 hrs', url:'https://www.deeplearning.ai/short-courses/', desc:'Andrew Ng\'s newest course on becoming an AI power user in your daily work. The perfect graduation course for Day 30.' },
+    tasks:['Complete Andrew Ng\'s AI Power User course as your 30-day graduation','Write a reflection: what changed in 30 days? What surprised you?','Set your 60-day AI goal and share one win or insight publicly'],
+    tip:'You started. You showed up. That\'s what most people never do. Now keep building.' },
+];
+
+let currentDay = 0;
+let doneDays = new Set(JSON.parse(localStorage.getItem('aiDashDone') || '[]'));
+let doneTasks = JSON.parse(localStorage.getItem('aiDashTasks') || '{}');
+
+function saveState() {
+  localStorage.setItem('aiDashDone', JSON.stringify([...doneDays]));
+  localStorage.setItem('aiDashTasks', JSON.stringify(doneTasks));
+}
+
+function getWeekColor(w) {
+  return ['var(--w1)','var(--w2)','var(--w3)','var(--w4)'][w];
+}
+function getWeekBg(w) {
+  return ['var(--w1bg)','var(--w2bg)','var(--w3bg)','var(--w4bg)'][w];
+}
+function getWeekBorder(w) {
+  return ['var(--w1b)','var(--w2b)','var(--w3b)','var(--w4b)'][w];
+}
+
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  let html = `<div class="logo">
+    <div class="logo-mark">Learning Plan</div>
+    <div class="logo-title">30-Day AI Roadmap</div>
+  </div>
+  <div class="progress-block">
+    <div class="progress-label"><span>Overall progress</span><span>${doneDays.size}/30 days</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${(doneDays.size/30*100).toFixed(0)}%"></div></div>
+  </div>`;
+
+  for (let w = 0; w < 4; w++) {
+    const wDays = DAYS.filter((_,i)=>DAYS[i].w===w);
+    const wStart = DAYS.findIndex(d=>d.w===w);
+    html += `<div class="nav-section">
+      <div class="nav-week-header" style="color:${getWeekColor(w)}">${WEEKS[w].label} — ${WEEKS[w].title}</div>`;
+    wDays.forEach((d, di) => {
+      const idx = wStart + di;
+      const isDone = doneDays.has(idx);
+      const isActive = idx === currentDay;
+      html += `<div class="nav-day ${isDone?'done':''} ${isActive?'active':''}" onclick="goDay(${idx})" id="nav-${idx}">
+        <div class="day-dot" style="background:${getWeekColor(w)};opacity:${isDone?0.3:1}"></div>
+        <span class="day-label">Day ${idx+1}: ${d.title}</span>
+        ${isDone ? '<span class="day-check">✓</span>' : ''}
+      </div>`;
+    });
+    html += `</div>`;
+  }
+  sb.innerHTML = html;
+  // mark active nav
+  const navActive = document.getElementById(`nav-${currentDay}`);
+  if (navActive) navActive.style.setProperty('--nav-color', getWeekColor(DAYS[currentDay].w));
+  document.querySelectorAll('.nav-day.active').forEach(el => {
+    el.style.setProperty('--border-color', getWeekColor(DAYS[currentDay].w));
+  });
+}
+
+function buildTabs() {
+  const tabs = document.getElementById('weekTabs');
+  tabs.innerHTML = WEEKS.map((w,i)=>`
+    <button class="wtab ${DAYS[currentDay].w===i?'on':''}" 
+      style="${DAYS[currentDay].w===i?`background:${getWeekBg(i)};color:${getWeekColor(i)};border-color:${getWeekBorder(i)}`:''}"
+      onclick="goWeek(${i})">${w.label}: ${w.title}</button>`).join('');
+}
+
+function buildStats() {
+  document.getElementById('currentDayLabel').textContent = currentDay+1;
+  document.getElementById('doneCount').textContent = doneDays.size;
+}
+
+function buildContent() {
+  const content = document.getElementById('content');
+  const d = DAYS[currentDay];
+  const w = d.w;
+  const color = getWeekColor(w);
+  const bg = getWeekBg(w);
+  const border = getWeekBorder(w);
+  const taskKey = `d${currentDay}`;
+  const myTasks = doneTasks[taskKey] || [];
+
+  const weekProg = [];
+  for (let ww=0;ww<4;ww++){
+    const wDays=DAYS.filter((_,i)=>DAYS[i].w===ww);
+    const wStart=DAYS.findIndex(dd=>dd.w===ww);
+    const done=wDays.filter((_,di)=>doneDays.has(wStart+di)).length;
+    weekProg.push({done,total:wDays.length,pct:Math.round(done/wDays.length*100)});
+  }
+
+  const weekOverview = WEEKS.map((wk,i)=>`
+    <div class="week-card ${DAYS[currentDay].w===i?'active':''}" onclick="goWeek(${i})" style="${DAYS[currentDay].w===i?`border-color:${getWeekBorder(i)}`:``}">
+      <div class="wc-label" style="color:${getWeekColor(i)}">${wk.label}</div>
+      <div class="wc-title">${wk.title}</div>
+      <div class="wc-sub">${weekProg[i].done}/${weekProg[i].total} days done</div>
+      <div class="wc-prog"><div class="wc-pfill" style="width:${weekProg[i].pct}%;background:${getWeekColor(i)}"></div></div>
+    </div>`).join('');
+
+  const tasks = d.tasks.map((t,ti)=>`
+    <li class="task-item ${myTasks.includes(ti)?'done':''}" onclick="toggleTask(${ti})">
+      <div class="task-cb"></div>
+      <span class="task-text">${t}</span>
+    </li>`).join('');
+
+  const isDone = doneDays.has(currentDay);
+  const prevDay = currentDay > 0 ? currentDay-1 : null;
+  const nextDay = currentDay < 29 ? currentDay+1 : null;
+
+  content.innerHTML = `
+    <div class="week-overview">${weekOverview}</div>
+
+    <div class="day-panel on">
+      <div class="day-hero">
+        <div class="day-num-badge" style="background:${bg};color:${color};border:1px solid ${border}">Day ${currentDay+1}</div>
+        <div class="day-hero-text">
+          <h1>${d.title}</h1>
+          <p>${d.desc}</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            Today's course
+          </div>
+          <div class="course-header">
+            <div class="course-icon-box" style="background:${bg}">📚</div>
+            <div>
+              <div class="course-name">${d.course.name}</div>
+              <div class="course-by">${d.course.by}</div>
+            </div>
+          </div>
+          <div class="course-desc">${d.course.desc}</div>
+          <div class="course-meta">
+            <span class="badge ${d.course.free?'badge-free':'badge-paid'}">${d.course.free?'Free':'Paid/trial'}</span>
+            <span class="badge badge-time">⏱ ${d.course.time}</span>
+            <a class="open-btn" href="${d.course.url}" target="_blank">Open course →</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Today's tasks
+          </div>
+          <ul class="task-list">${tasks}</ul>
+        </div>
+      </div>
+
+      <div class="grid-full">
+        <div class="card">
+          <div class="card-label">💡 Tip for today</div>
+          <div class="tip-card" style="background:${bg};border-radius:var(--radius-sm)">
+            <span class="tip-icon" style="color:${color}">→</span>
+            <span>${d.tip}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="day-nav">
+        ${prevDay!==null?`<button class="nav-btn" onclick="goDay(${prevDay})">← Day ${prevDay+1}</button>`:'<span></span>'}
+        <button class="nav-btn mark-done ${isDone?'marked':''}" onclick="toggleDone()">
+          ${isDone?'✓ Day complete':'Mark day complete'}
+        </button>
+        ${nextDay!==null?`<button class="nav-btn primary" onclick="goDay(${nextDay})">Day ${nextDay+1} →</button>`:'<button class="nav-btn primary" disabled>All done! 🎉</button>'}
+      </div>
+    </div>`;
+}
+
+function goDay(idx) {
+  currentDay = idx;
+  buildSidebar();
+  buildTabs();
+  buildStats();
+  buildContent();
+  window.scrollTo(0,0);
+}
+
+function goWeek(w) {
+  const firstDay = DAYS.findIndex(d=>d.w===w);
+  if (firstDay >= 0) goDay(firstDay);
+}
+
+function toggleDone() {
+  if (doneDays.has(currentDay)) {
+    doneDays.delete(currentDay);
+  } else {
+    doneDays.add(currentDay);
+  }
+  saveState();
+  goDay(currentDay);
+}
+
+function toggleTask(ti) {
+  const taskKey = `d${currentDay}`;
+  if (!doneTasks[taskKey]) doneTasks[taskKey] = [];
+  const idx = doneTasks[taskKey].indexOf(ti);
+  if (idx >= 0) doneTasks[taskKey].splice(idx,1);
+  else doneTasks[taskKey].push(ti);
+  saveState();
+  buildContent();
+}
+
+// Init — find first incomplete day
+let startDay = 0;
+for (let i=0;i<30;i++) { if (!doneDays.has(i)) { startDay=i; break; } }
+goDay(startDay);
+</script>
+</body>
+</html>
